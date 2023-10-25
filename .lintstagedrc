@@ -1,0 +1,3 @@
+{
+  "*.ts": ["pnpm eslint . --ext .ts --fix", "pnpm prettier --write ."]
+}
