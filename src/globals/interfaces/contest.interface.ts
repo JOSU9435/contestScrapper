@@ -2,13 +2,13 @@ class Contest {
   name: string;
   platform: string;
   contestUrl: string;
-  startTime: Date;
+  startTime?: Date;
 
   constructor(
     name: string,
     platform: string,
     contestUrl: string,
-    startTime: Date
+    startTime?: Date
   ) {
     this.name = name;
     this.platform = platform;
