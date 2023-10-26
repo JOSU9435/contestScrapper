@@ -4,6 +4,8 @@ import helmet from "helmet";
 import morgan from "morgan";
 import cors from "cors";
 
+import * as Routes from "./routes";
+
 dotenv.config();
 const app = express();
 
@@ -24,6 +26,8 @@ app
 // =========================== MIDDLEWARES END ===========================
 
 // =========================== ROUTES START ===========================
+
+app.use("/contest", Routes.contestRouter);
 
 // =========================== ROUTES END ===========================
 
