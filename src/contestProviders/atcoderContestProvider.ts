@@ -1,5 +1,6 @@
 import axios from "axios";
 import * as Interfaces from "../globals/interfaces";
+import * as Models from "../globals/models";
 import * as cheerio from "cheerio";
 import * as Constants from "../globals/constants";
 
@@ -10,7 +11,7 @@ const atcoderContestProvider: Interfaces.Contest.ContestProvider = async () => {
       timeout: Constants.ContestProviders.ATCODER_REQUEST_TIMEOUT || 5000,
     });
   } catch (error) {
-    console.log("atcoderContestProvider failed unexpectedly", error);
+    console.error("atcoderContestProvider failed unexpectedly", error);
     return [];
   }
 
@@ -24,7 +25,7 @@ const atcoderContestProvider: Interfaces.Contest.ContestProvider = async () => {
     const row = $(el).children();
 
     result.push(
-      new Interfaces.Contest.Contest(
+      new Models.Contest.Contest(
         row.eq(1).find("a").text().trim(),
         "atcoder",
         `atcoder.jp${row.eq(1).find("a").attr("href")?.trim() || "/contests"}`,

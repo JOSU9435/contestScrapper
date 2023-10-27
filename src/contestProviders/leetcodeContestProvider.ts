@@ -1,5 +1,6 @@
 import axios from "axios";
 import * as Interfaces from "../globals/interfaces";
+import * as Models from "../globals/models";
 import * as cheerio from "cheerio";
 import * as Constants from "../globals/constants";
 
@@ -14,7 +15,7 @@ const leetcodeContestProvider: Interfaces.Contest.ContestProvider =
         }
       );
     } catch (error) {
-      console.log("leetcodeContestProvider failed unexpectedly", error);
+      console.error("leetcodeContestProvider failed unexpectedly", error);
       return [];
     }
 
@@ -28,7 +29,7 @@ const leetcodeContestProvider: Interfaces.Contest.ContestProvider =
       const row = $(el);
 
       result.push(
-        new Interfaces.Contest.Contest(
+        new Models.Contest.Contest(
           row.find("div.truncate").text().trim(),
           "leetcode",
           `https://leetcode.com${row.attr("href")?.trim() || ""}`

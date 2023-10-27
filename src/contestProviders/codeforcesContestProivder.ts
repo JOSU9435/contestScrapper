@@ -1,5 +1,6 @@
 import axios from "axios";
 import * as Interfaces from "../globals/interfaces";
+import * as Models from "../globals/models";
 import * as cheerio from "cheerio";
 import * as Constants from "../globals/constants";
 
@@ -15,7 +16,7 @@ const codeforcesContestProvider: Interfaces.Contest.ContestProvider =
         }
       );
     } catch (error) {
-      console.log("codeforcesContestProvider failed unexpectedly", error);
+      console.error("codeforcesContestProvider failed unexpectedly", error);
       return [];
     }
 
@@ -31,7 +32,7 @@ const codeforcesContestProvider: Interfaces.Contest.ContestProvider =
       const row = $(el).children();
 
       result.push(
-        new Interfaces.Contest.Contest(
+        new Models.Contest.Contest(
           row.eq(0).text().replace(/\n/g, "").trim(),
           "codeforces",
           row.eq(5).find("a.red-link").attr("href")?.trim() || "",
