@@ -1,10 +1,5 @@
-interface Contest {
-  name: string;
-  platform: string;
-  contestUrl: string;
-  startTime?: Date;
-}
+import * as Models from "../models";
 
-type ContestProvider = () => Promise<Array<Contest> | never>;
+type ContestProvider = () => Promise<Array<Models.Contest.Contest> | never>;
 
-export { Contest, ContestProvider };
+export { ContestProvider };

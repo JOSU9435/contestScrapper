@@ -1,6 +1,4 @@
-import * as Interfaces from "../interfaces";
-
-class Contest implements Interfaces.Contest.Contest {
+class Contest {
   name: string;
   platform: string;
   contestUrl: string;

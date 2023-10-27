@@ -26,7 +26,7 @@ const codeforcesContestProvider: Interfaces.Contest.ContestProvider =
 
     const table = $("table").eq(0).find("tbody").children();
 
-    const result: Array<Interfaces.Contest.Contest> = [];
+    const result: Array<Models.Contest.Contest> = [];
 
     table.each((_i, el) => {
       const row = $(el).children();

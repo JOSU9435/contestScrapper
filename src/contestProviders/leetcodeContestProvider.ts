@@ -23,7 +23,7 @@ const leetcodeContestProvider: Interfaces.Contest.ContestProvider =
     const $ = cheerio.load(htmlPage);
     const table = $("div.swiper-wrapper").eq(0).find("a");
 
-    const result: Array<Interfaces.Contest.Contest> = [];
+    const result: Array<Models.Contest.Contest> = [];
 
     table.each((_i, el) => {
       const row = $(el);

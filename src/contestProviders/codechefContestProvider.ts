@@ -28,7 +28,7 @@ const codechefContestProvider: Interfaces.Contest.ContestProvider =
 
     const table = $("tbody.MuiTableBody-root").eq(1).children();
 
-    const result: Array<Interfaces.Contest.Contest> = [];
+    const result: Array<Models.Contest.Contest> = [];
 
     table.each((_i, el) => {
       const row = $(el).children();

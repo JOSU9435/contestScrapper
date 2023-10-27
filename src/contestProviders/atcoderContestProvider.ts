@@ -19,7 +19,7 @@ const atcoderContestProvider: Interfaces.Contest.ContestProvider = async () => {
   const $ = cheerio.load(htmlPage);
   const table = $("#contest-table-upcoming").find("tbody").children();
 
-  const result: Array<Interfaces.Contest.Contest> = [];
+  const result: Array<Models.Contest.Contest> = [];
 
   table.each((_i, el) => {
     const row = $(el).children();
