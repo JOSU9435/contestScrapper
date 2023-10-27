@@ -28,7 +28,9 @@ const atcoderContestProvider: Interfaces.Contest.ContestProvider = async () => {
       new Models.Contest.Contest(
         row.eq(1).find("a").text().trim(),
         "atcoder",
-        `atcoder.jp${row.eq(1).find("a").attr("href")?.trim() || "/contests"}`,
+        `https://atcoder.jp${
+          row.eq(1).find("a").attr("href")?.trim() || "/contests"
+        }`,
         new Date(row.eq(0).find("a").text().trim())
       )
     );

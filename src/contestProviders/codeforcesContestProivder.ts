@@ -35,7 +35,9 @@ const codeforcesContestProvider: Interfaces.Contest.ContestProvider =
         new Models.Contest.Contest(
           row.eq(0).text().replace(/\n/g, "").trim(),
           "codeforces",
-          row.eq(5).find("a.red-link").attr("href")?.trim() || "",
+          `https://codeforces.com${
+            row.eq(5).find("a.red-link").attr("href")?.trim() || "/contests"
+          }`,
           new Date(row.eq(2).text().trim())
         )
       );
