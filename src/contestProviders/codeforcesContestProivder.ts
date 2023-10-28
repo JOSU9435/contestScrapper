@@ -38,7 +38,7 @@ const codeforcesContestProvider: Interfaces.Contest.ContestProvider =
           `https://codeforces.com${
             row.eq(5).find("a.red-link").attr("href")?.trim() || "/contests"
           }`,
-          new Date(row.eq(2).text().trim())
+          new Date(row.eq(2).text().trim() + " UTC+3")
         )
       );
     });
