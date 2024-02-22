@@ -9,7 +9,13 @@ const codechefContestProvider: Interfaces.Contest.ContestProvider =
     let htmlPage;
     let browser;
     try {
-      browser = await puppeteer.launch({ headless: "new" });
+      browser = await puppeteer.launch({
+        headless: "new",
+        executablePath:
+          process.env.NODE_ENV === "production"
+            ? process.env.PUPPETEER_EXECUTABLE_PATH
+            : puppeteer.executablePath(),
+      });
       const page = await browser.newPage();
       await page.setViewport({ width: 1080, height: 1024 });
       await page.goto(Constants.ContestProviders.CODECHEF_CONTEST_URL);
