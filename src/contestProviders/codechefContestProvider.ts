@@ -13,7 +13,7 @@ const codechefContestProvider: Interfaces.Contest.ContestProvider =
       const page = await browser.newPage();
       await page.setViewport({ width: 1080, height: 1024 });
       await page.goto(Constants.ContestProviders.CODECHEF_CONTEST_URL);
-      await page.waitForSelector("td._name__cell_1c9os_439 > div > a", {
+      await page.waitForSelector("td._name__cell_ioa8k_482", {
         timeout: 5000,
       });
       htmlPage = await page.content();
