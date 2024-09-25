@@ -26,18 +26,20 @@ const codechefContestProvider: Interfaces.Contest.ContestProvider =
 
       const contests = await page.evaluate((el) => {
         return [...el.children].map(({ children: rowItems }) => {
+          const date = [...rowItems[2].querySelectorAll("p")].map(
+            (p) => p.textContent
+          );
           return {
             name: rowItems[1].querySelector("span")?.textContent || "",
             platform: "codechef",
             contestUrl:
               rowItems[1].querySelector("a")?.href ||
               "https://www.codechef.com/contests",
-            date: [...rowItems[2].querySelectorAll("p")]
-              .map((p) => p.textContent)
-              .join(" "),
+            date: `${date[0]} ${date[1]?.substring(4)}`,
           };
         });
       }, contestTable);
+      console.log(contests);
       browser.close();
 
       return contests.map(
