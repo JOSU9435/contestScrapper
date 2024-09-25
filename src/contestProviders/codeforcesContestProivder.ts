@@ -1,50 +1,58 @@
-import axios from "axios";
 import * as Interfaces from "../globals/interfaces";
 import * as Models from "../globals/models";
-import * as cheerio from "cheerio";
 import * as Constants from "../globals/constants";
+import puppeteer from "puppeteer";
 
 const codeforcesContestProvider: Interfaces.Contest.ContestProvider =
   async () => {
-    let response;
+    let browser;
     try {
-      response = await axios.get(
-        Constants.ContestProviders.CODEFORCES_CONTEST_URL,
-        {
-          timeout:
-            Constants.ContestProviders.CODEFORCES_REQUEST_TIMEOUT || 5000,
-        }
-      );
+      browser = await puppeteer.launch({
+        headless: false,
+        executablePath:
+          process.env.NODE_ENV === "production"
+            ? process.env.PUPPETEER_EXECUTABLE_PATH
+            : puppeteer.executablePath(),
+      });
+
+      const page = await browser.newPage();
+      await page.setViewport({ width: 1920, height: 1080 });
+      await page.goto(Constants.ContestProviders.CODEFORCES_CONTEST_URL);
+
+      const eventTable = await page
+        .locator(
+          "xpath//html/body/div[6]/div[5]/div[2]/div[1]/div[1]/div[6]/table/tbody"
+        )
+        .waitHandle();
+
+      const contests = await page.evaluate((el) => {
+        const rows = [...el.children];
+        rows.shift();
+        return rows.map(({ children: rowItems }) => {
+          return {
+            name: rowItems[0].textContent?.split("\n")[1].trim() || "",
+            platform: "codeforces",
+            contestUrl: rowItems[5].querySelector("a")?.href,
+            date: rowItems[2].textContent?.replace("UTC", " UTC").trim(),
+          };
+        });
+      }, eventTable);
+
+      browser.close();
+
+      return contests.map(({ name, platform, contestUrl, date }) => {
+        return new Models.Contest.Contest(
+          name,
+          platform,
+          contestUrl || "",
+          new Date(date || "")
+        );
+      });
     } catch (error) {
       console.error("codeforcesContestProvider failed unexpectedly", error);
+      browser?.close();
       return [];
     }
-
-    const htmlPage = response.data;
-
-    const $ = cheerio.load(htmlPage);
-
-    const table = $("table").eq(0).find("tbody").children();
-
-    const result: Array<Models.Contest.Contest> = [];
-
-    table.each((_i, el) => {
-      const row = $(el).children();
-
-      result.push(
-        new Models.Contest.Contest(
-          row.eq(0).text().replace(/\n/g, "").trim(),
-          "codeforces",
-          `https://codeforces.com${
-            row.eq(5).find("a.red-link").attr("href")?.trim() || "/contests"
-          }`,
-          new Date(row.eq(2).text().trim() + " UTC+3")
-        )
-      );
-    });
-
-    result.shift();
-    return result;
   };
 
 export { codeforcesContestProvider };

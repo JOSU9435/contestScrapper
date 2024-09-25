@@ -2,11 +2,9 @@ import puppeteer from "puppeteer";
 import * as Interfaces from "../globals/interfaces";
 import * as Models from "../globals/models";
 import * as Constants from "../globals/constants";
-import * as cheerio from "cheerio";
 
 const codechefContestProvider: Interfaces.Contest.ContestProvider =
   async () => {
-    let htmlPage;
     let browser;
     try {
       browser = await puppeteer.launch({
@@ -17,42 +15,40 @@ const codechefContestProvider: Interfaces.Contest.ContestProvider =
             : puppeteer.executablePath(),
       });
       const page = await browser.newPage();
-      await page.setViewport({ width: 1080, height: 1024 });
+      await page.setViewport({ width: 1920, height: 1080 });
       await page.goto(Constants.ContestProviders.CODECHEF_CONTEST_URL);
-      await page.waitForSelector("td._name__cell_ioa8k_482", {
-        timeout: 5000,
-      });
-      htmlPage = await page.content();
+
+      const contestTable = await page
+        .locator(
+          "xpath//html/body/div[1]/div/div[3]/div/div/div[2]/div[1]/div[2]/div/div[2]/table/tbody"
+        )
+        .waitHandle();
+
+      const contests = await page.evaluate((el) => {
+        return [...el.children].map(({ children: rowItems }) => {
+          return {
+            name: rowItems[1].querySelector("span")?.textContent || "",
+            platform: "codechef",
+            contestUrl:
+              rowItems[1].querySelector("a")?.href ||
+              "https://www.codechef.com/contests",
+            date: [...rowItems[2].querySelectorAll("p")]
+              .map((p) => p.textContent)
+              .join(" "),
+          };
+        });
+      }, contestTable);
       browser.close();
+
+      return contests.map(
+        ({ name, platform, contestUrl, date }) =>
+          new Models.Contest.Contest(name, platform, contestUrl, new Date(date))
+      );
     } catch (error) {
       console.error("codechefContestProvider failed unexpectedly", error);
       browser?.close();
       return [];
     }
-
-    const $ = cheerio.load(htmlPage);
-
-    const table = $("tbody.MuiTableBody-root").eq(1).children();
-
-    const result: Array<Models.Contest.Contest> = [];
-
-    table.each((_i, el) => {
-      const row = $(el).children();
-
-      const contestDate = row.eq(2).find("p").first().text().trim();
-      const contestTime = row.eq(2).find("p").last().text().substring(3);
-
-      result.push(
-        new Models.Contest.Contest(
-          row.eq(1).find("a").text().trim(),
-          "codechef",
-          row.eq(1).find("a").attr("href")?.trim() || "",
-          new Date(`${contestDate} ${contestTime}`)
-        )
-      );
-    });
-
-    return result;
   };
 
 export { codechefContestProvider };
