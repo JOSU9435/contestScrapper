@@ -1,4 +1,4 @@
-const CODEFORCES_CONTEST_URL = "https://codeforces.com/contests";
+const CODEFORCES_CONTEST_URL = "https://codeforces.com/api/contest.list";
 const ATCODER_CONTEST_URL = "https://atcoder.jp/contests/";
 const LEETCODE_CONTEST_URL = "https://leetcode.com/contest/";
 const CODECHEF_CONTEST_URL = "https://www.codechef.com/contests";

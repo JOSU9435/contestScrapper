@@ -1,56 +1,35 @@
 import * as Interfaces from "../globals/interfaces";
 import * as Models from "../globals/models";
 import * as Constants from "../globals/constants";
-import puppeteer from "puppeteer";
+import axios from "axios";
 
 const codeforcesContestProvider: Interfaces.Contest.ContestProvider =
   async () => {
-    let browser;
     try {
-      browser = await puppeteer.launch({
-        headless: false,
-        executablePath:
-          process.env.NODE_ENV === "production"
-            ? process.env.PUPPETEER_EXECUTABLE_PATH
-            : puppeteer.executablePath(),
-      });
+      const response = await axios.get(
+        `${Constants.ContestProviders.CODEFORCES_CONTEST_URL}?gym=false`
+      );
 
-      const page = await browser.newPage();
-      await page.setViewport({ width: 1920, height: 1080 });
-      await page.goto(Constants.ContestProviders.CODEFORCES_CONTEST_URL);
+      if (response.data.status !== "OK") {
+        throw new Error("Codeforces API error");
+      }
 
-      const eventTable = await page
-        .locator(
-          "xpath//html/body/div[6]/div[5]/div[2]/div[1]/div[1]/div[6]/table/tbody"
-        )
-        .waitHandle();
+      const contests: Interfaces.codeforces.codefrocesContest[] =
+        response.data.result;
 
-      const contests = await page.evaluate((el) => {
-        const rows = [...el.children];
-        rows.shift();
-        return rows.map(({ children: rowItems }) => {
-          return {
-            name: rowItems[0].textContent?.split("\n")[1].trim() || "",
-            platform: "codeforces",
-            contestUrl: rowItems[5].querySelector("a")?.href,
-            date: rowItems[2].textContent?.replace("UTC", " UTC").trim(),
-          };
-        });
-      }, eventTable);
-
-      browser.close();
-
-      return contests.map(({ name, platform, contestUrl, date }) => {
-        return new Models.Contest.Contest(
-          name,
-          platform,
-          contestUrl || "",
-          new Date(date || "")
+      return contests
+        .filter((contest) => contest.phase === "BEFORE")
+        .map(
+          ({ name, startTimeSeconds, id }) =>
+            new Models.Contest.Contest(
+              name,
+              "codeforces",
+              `https://codeforces.com/contestRegistration/${id}`,
+              new Date(startTimeSeconds * 1000)
+            )
         );
-      });
     } catch (error) {
       console.error("codeforcesContestProvider failed unexpectedly", error);
-      browser?.close();
       return [];
     }
   };
