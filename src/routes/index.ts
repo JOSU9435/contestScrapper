@@ -1,3 +1,4 @@
 import contestRouter from "./contest";
+import health from "./health";
 
-export { contestRouter };
+export { contestRouter, health };
